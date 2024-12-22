@@ -144,6 +144,10 @@ The application implements comprehensive error handling:
 mvn clean test
 ```
 
+### Munits Coverage Report
+![image](https://github.com/user-attachments/assets/26a7eb6a-dbcb-4e29-b21a-c01998b34eb1)
+
+
 ## Run Locally
 
 Configure these two vm arguments to run in your machine to avoid blocking your requests and munit execution
