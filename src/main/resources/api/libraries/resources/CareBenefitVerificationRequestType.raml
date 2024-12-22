@@ -1,0 +1,95 @@
+#%RAML 1.0 Library
+usage: Contains the types for creating the Care Benefit Verification Request
+
+types:
+    CareBenefitVerification:
+      type: object
+      description: Holds details of Care Benefit Verification
+      properties:
+        patientDetails:
+          type: PatientInfo
+          description: Patient Information for request creation
+          required : true
+        insuranceInformation:
+          type: InsuranceInfo
+          description: Patient Insurence Information for request creation
+          required : true
+        providerInformation:
+          type: ProviderInfo
+          description: Patient health Care Provider Information for request creation
+          required : false
+        serviceDetails:
+          type: ServiceInfo
+          description: Patient Service Information for request creation
+          required : false
+        
+    
+    PatientInfo:
+      type: object
+      properties:
+        firstName: 
+          type: string
+          required: true
+          pattern: '^[A-Za-z\s]+$'
+        lastName: 
+          type: string
+          required: true
+          pattern: '^[A-Za-z\s]+$'
+        dateOfBirth:
+          type: date-only
+          required: true
+        gender:
+          type: string
+          required: true
+          enum: ['Male', 'Female', 'non-binary']
+
+    InsuranceInfo:
+      type: object
+      properties:
+        insuranceProviderName:
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9\s\.\-]+$'
+        policyNumber:
+          type: string
+          required: false
+          pattern: '^[A-Za-z0-9\s]+$'
+        groupNumber:
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9\s]+$'
+        subscriberID:
+          type: string
+          required: false
+          pattern: '^[A-Za-z0-9\s]+$'
+
+    ProviderInfo:
+      type: object
+      properties:
+        nationalProviderIdentifier:
+          type: string
+          pattern: '^[A-Za-z0-9\s]+$'
+          required: true
+        providerName:
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9\s\.\-]+$'
+
+    ServiceInfo:
+      type: object
+      properties:
+        serviceType:
+          type: string
+          required: true
+          pattern: '^[A-Za-z\s]+$'
+        serviceDate:
+          type: date-only
+          required: true
+        diagnosisCode:
+          type: string
+          required: true
+          pattern: '^\d+$'
+        procedureCode:
+          type: string
+          required: true
+          pattern: '^\d+$'  

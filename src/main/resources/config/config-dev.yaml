@@ -1,0 +1,17 @@
+api:
+  autodiscoveryID: "20126081"
+  baseurl: "https://localhost:8081/api" 
+
+
+#Salesforce Connection details
+salesforce:
+  system.username: "CREATE_NEW"
+  system.password: "CREATE_NEW"
+  system.token: "CREATE_NEW"
+  system.auth.url: "https://login.salesforce.com/services/Soap/u/56.0"
+  system.token.endpoint: "https://login.salesforce.com/services/oauth2/token"
+  system.authorize.endpoint : "https://login.salesforce.com/services/oauth2/authorize"
+  system.consumerKey : "CREATE_NEW"
+  system.consumerSecret : "CREATE_NEW"
+
+

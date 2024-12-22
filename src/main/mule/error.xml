@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+
+	
+
+	<error-handler name="apikitErrors" doc:description="Error handler to route to error description type and http status.">
+		<on-error-continue type="APIKIT:BAD_REQUEST, HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:FORBIDDEN, HTTP:NOT_ACCEPTABLE, HTTP:PARSING, HTTP:SECURITY, HTTP:UNAUTHORIZED">
+			<set-variable value="#[p('secure::errorcode.http.bad.request')]" doc:name="Set Http Status" doc:id="fe4942ed-3871-418c-8bd8-97176a3bb8bc" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Tansform Bad Request 400" doc:id="138c95f5-b41c-4b9c-a2db-a5f66be5a0d3">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="b59a8080-1f03-46e2-bf10-19ab5e75203c" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-continue>
+		<on-error-continue type="APIKIT:METHOD_NOT_ALLOWED, HTTP:METHOD_NOT_ALLOWED">
+			<set-variable value="#[p('secure::errorcode.http.method.notallowed')]" doc:name="Set Http Status" doc:id="5c044cb5-d6b6-4662-a2d8-7e921ec2bfd0" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform Method Not Allowed 405">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="9bf3514e-b08d-4d8f-9805-72e772b5e9da" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-continue>
+		<on-error-continue type="APIKIT:NOT_ACCEPTABLE, HTTP:NOT_ACCEPTABLE">
+			<set-variable value="#[p('secure::errorcode.http.not.acceptable')]" doc:name="Set Http Status" doc:id="cc1aa808-eb75-4b1c-a725-a7eda41e0398" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform Not Acceptable 406">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="efb90764-7a3a-4e26-a9f9-4cf5deb4083f" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-continue>
+		<on-error-continue type="APIKIT:UNSUPPORTED_MEDIA_TYPE, HTTP:UNSUPPORTED_MEDIA_TYPE">
+			<set-variable value="#[p('secure::errorcode.http.media.unsupported')]" doc:name="Set Http Status" doc:id="ad1e0aee-2b9b-46f1-a5a3-421927b01cfe" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform Unsupported 415">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="06c44a88-a564-4497-b752-34dd390a2311" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true"
+			logException="true" doc:name="On Error Propagate" doc:id="a0edc3cd-0415-47a0-96e3-255ead62bd95"
+			type="HTTP:TOO_MANY_REQUESTS">
+			<set-variable value="#[p('secure::errorcode.http.toomany.requests')]" doc:name="Set Http Status" doc:id="3fc64617-c8c7-44d7-a593-94fb429243f9" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+				doc:id="c9db19f7-0160-42f6-8dc2-c300acc72aa8" doc:name="Transform Too Many Requests 429">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpReason"><![CDATA["Too Many Requests"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="f5f97026-dc82-4f90-b74a-dd0506b529f7" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-propagate>
+		<on-error-continue type="APIKIT:NOT_IMPLEMENTED">
+			<set-variable value="#[p('secure::errorcode.http.not.implemented')]" doc:name="Set Http Status" doc:id="4109b272-f0b2-46d9-b55e-c5ec20d97b32" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:name="Transform Not Implemented 501">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="d3dab92b-c0d7-4abf-8550-ef4d69d5fa2f" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true"
+			logException="true" doc:name="On Error Propagate" doc:id="8b62ac0a-9b48-4d6b-b09a-d7e8e89306a5"
+			type="HTTP:CONNECTIVITY, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:BAD_GATEWAY">
+
+			<set-variable value="#[p('secure::errorcode.http.connectivity')]" doc:name="Set Http Status" doc:id="8a9e3033-515e-44c2-9fe2-378a02ad6848" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd"
+				doc:id="950d37ad-18bd-4edb-99c1-1adf9e3fdd58" doc:name="Transform Service Unavilable 503">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpReason"><![CDATA["Service Unavailable"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="3c6de527-a716-49f6-a1de-2778e71bbf54" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" type="HTTP:TIMEOUT">
+			<set-variable value="#[p('secure::errorcode.http.timeout')]" doc:name="Set Http Status" doc:id="b327f424-805c-4325-a669-bc4f11a2b63b" variableName="httpStatus"/>
+
+			<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+				xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" doc:id="4d66e0a1-2935-4394-8188-98ddf5c7d2f0" doc:name="Transform Dependent Service Timeout">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpReason" ><![CDATA["Dependent Service Timeout"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="963f38d8-4a48-4b0b-855d-08ccbdcfc5b5" name="apiKitErrorsLoggerMetricSubFlow"/>
+		</on-error-propagate>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="39396b68-2337-4f43-a72e-74ae3de03764" type="ANY">
+			<set-variable value="#[p('secure::errorcode.default.unknown')]" doc:name="Set Http Status" doc:id="ae55bfab-6b77-49a0-a2d7-bb907e537417" variableName="httpStatus" />
+			<ee:transform doc:name="Transform Unknown Error 500" doc:id="65e7b2e1-3654-4deb-a207-95008696c3f7">
+				<ee:message>
+					<ee:set-payload resource="dwscripts/ErrorConstruction.dwl" />
+				</ee:message>
+
+			</ee:transform>
+			<flow-ref doc:name="apiKitErrorsLoggerMetricSubFlow" doc:id="360485e2-128d-4a04-9f6a-7425a2c27393" name="apiKitErrorsLoggerMetricSubFlow" />
+		</on-error-continue>
+	</error-handler>
+	<sub-flow name="apiKitErrorsLoggerMetricSubFlow" doc:id="e1db5218-4b76-4beb-8234-9caa5dfa004b" doc:description="Reusable sub flow to log the error message using Json logger component.">
+		<logger level="INFO" doc:name="Logger" doc:id="23d19ef9-5757-4f45-8d95-b1a2339b83f9" message="#[payload]"/>
+	</sub-flow>
+</mule>

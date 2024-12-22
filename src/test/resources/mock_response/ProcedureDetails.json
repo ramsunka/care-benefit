@@ -1,0 +1,14 @@
+[
+  {
+    "CodeSetType": "CPT",
+    "CodeDescription": "45 minutes of individual psychotherapy",
+    "IsActive": "true",
+    "CreatedDate": "2024-12-12T05:50:48.000Z",
+    "Id": "0hsKd000000oVsEIAU",
+    "type": "CodeSet",
+    "Code": "90834",
+    "CodeSetKey": "4BD4DBDC9B6C16E93577015A3DDDDE2A272208939",
+    "EndDate": null,
+    "Name": "Psychotherapy"
+  }
+]

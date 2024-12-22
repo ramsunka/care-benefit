@@ -1,0 +1,14 @@
+{
+    "patientDetails": {
+        "firstName": "Charles",
+        "lastName": "Green",
+        "dateOfBirth": "1991-12-20",
+        "gender": "Male"
+    },
+    "insuranceInformation": {
+        "insuranceProviderName": "Makana Medicaid",
+        "policyNumber": "BC123456789",
+        "groupNumber": "W1259801",
+        "subscriberID": "BCBS-SUB-987654"
+    }
+}

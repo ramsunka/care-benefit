@@ -1,0 +1,35 @@
+#%RAML 1.0 Library
+usage:
+# Defining resource types.
+resourceTypes:
+  rest-resource:
+    description: Reuse method in any api
+    get?:
+      description: <<getOutputDescription>>
+      is: [commontraits.accept-required,commontraits.error,commontraits.transaction-id-required]
+      responses:
+        200:
+          description:
+            Success .
+          body:
+            application/json:
+              example: <<getOutputExample>>
+        204:
+          description:
+            Success with No Content.
+          body:
+            application/json:  
+    post?:
+      description: <<postDescription>>
+      is: [commontraits.accept-required,commontraits.error,commontraits.transaction-id-required,commontraits.content-type-required ]
+      body:
+        application/json:
+          type: <<postInputType>>
+          example: <<postInputExample>>
+      responses:
+        201:
+          description: success 
+          body:
+            application/json:
+              example: <<postOutputExample>>   
+     

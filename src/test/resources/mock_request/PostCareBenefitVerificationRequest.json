@@ -1,0 +1,24 @@
+{
+    "patientDetails": {
+        "firstName": "Charles",
+        "lastName": "Green",
+        "dateOfBirth": "1991-12-20",
+        "gender": "Male"
+    },
+    "insuranceInformation": {
+        "insuranceProviderName": "Makana Medicaid",
+        "policyNumber": "BC123456789",
+        "groupNumber": "W1259801",
+        "subscriberID": "BCBS-SUB-987654"
+    },
+    "providerInformation": {
+        "nationalProviderIdentifier": "1234567890",
+        "providerName": "Dr. Emily Johnson"
+    },
+    "serviceDetails": {
+        "serviceType": "consultation",
+        "serviceDate": "2024-12-14",
+        "diagnosisCode": "F32.9",
+        "procedureCode": "99213"
+    }
+}

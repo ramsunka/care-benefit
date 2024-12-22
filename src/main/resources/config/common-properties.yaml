@@ -1,0 +1,37 @@
+api:
+  base: "api"
+  version: "v1"
+  
+keystore:
+  alias: "assignment"   
+  path: "keystore-Assignment.jks"
+  keypass: "Assignment"
+  password: "Assignment"
+
+https:
+  host: "0.0.0.0"
+  port: "8081"
+  reconnection:
+    frequency: "2000"
+    attempts: "3"
+  responseTimeOut: "10000"
+  connectionTimeOut: "30000" 
+
+errorcode:
+  http.bad.request: "400"
+  http.not.found: "404"
+  http.method.notallowed: "405"
+  http.not.acceptable: "406"
+  http.media.unsupported: "415"
+  http.toomany.requests: "429"
+  http.not.implemented: "501"
+  http.connectivity: "502"
+  http.timeout: "599"
+  default.unknown: "500"
+  mule.expression: "7001"
+  
+ping:
+  application.name: "${project.artifactId}"
+  application.version: "${project.version}"
+
+

@@ -1,0 +1,15 @@
+#%RAML 1.0 Library
+traits:
+  success-response:
+    responses:
+      200:
+        description: <<successDescription>>
+        body: 
+          application/json:
+            example: <<successResponse>>      
+      204:
+        description:
+          Success with No Content.
+        body:
+          application/json:  
+ 

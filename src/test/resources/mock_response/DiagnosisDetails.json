@@ -1,0 +1,15 @@
+[
+  {
+    "CodeSetType": "ICD-10",
+    "CodeDescription": null,
+    "OwnerId": "005Kd000005Um4TIAS",
+    "IsActive": "true",
+    "CreatedDate": "2024-12-12T05:50:48.000Z",
+    "Id": "0hsKd000000oVsUIAU",
+    "type": "CodeSet",
+    "Code": "8151",
+    "CodeSetKey": "6fa99c9500356ed5bbf1720bb6931573-137420295",
+    "EndDate": null,
+    "Name": "Hip Replacement Surgery"
+  }
+]

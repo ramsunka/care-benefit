@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<munit:config name="error.xml" />
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="1458ab57-b211-4eb7-a422-cbbfd4c72987" responseTimeout="180000" >
+		<http:request-connection protocol="HTTPS" host="0.0.0.0" port="8081" connectionIdleTimeout="180000" >
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="c378e956-18e5-46e0-8da0-07e325609fdd" file="config\common-properties.yaml" />
+	<munit:test name="get:\ping:api-main-config-404-application\json-FlowTest" description="Verifying functionality of [get:\ping:api-main-config-404-application\json]">
+        <munit:enable-flow-sources>
+			<munit:enable-flow-source value="get:\ping:care-benefit-verification-config" />
+			<munit:enable-flow-source value="care-benefit-verification-main" />
+
+
+        </munit:enable-flow-sources>
+        <munit:execution>
+            <http:request config-ref="HTTP_Request_configuration" method="GET" path="/pingo">
+                <http:headers><![CDATA[#[{"Accept":"application/json","accept":"application/json"}]]]></http:headers>
+                <http:response-validator>
+                    <http:success-status-code-validator values="404" />
+                </http:response-validator>
+            </http:request>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(404)]" message="The HTTP Status code is not correct!" doc:name="Assert That Status Code is 404" />
+        </munit:validation>
+    </munit:test>
+	<munit:test name="get:\ping:api-main-config-400-application\json-FlowTest" doc:id="b5c369da-d279-4c65-885d-c7800d7af424" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="care-benefit-verification-main" />
+		</munit:enable-flow-sources>
+		<munit:execution >
+			<http:request method="GET" doc:name="Request" doc:id="ccb668eb-39c4-4e9b-9a0b-e016a8dcf0ac" config-ref="HTTP_Request_configuration" path="/api/v1/ping" responseTimeout="120000">
+				<http:headers ><![CDATA[#[{"Accept":"application/json","accept":"application/json"}]]]></http:headers>
+				<http:response-validator >
+					<http:success-status-code-validator values="400" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert That Status Code is 400" doc:id="d8bcd018-9f98-41ba-b12b-48d69032253b" message="The HTTP Status code is not correct!" expression="#[attributes.statusCode]" is="#[MunitTools::equalTo(400)]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="gePing-406-error-test-case" doc:id="e3620a5f-b5f2-47e9-8513-4b763afebc1a" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="care-benefit-verification-main" />
+			<munit:enable-flow-source value="apikitErrors" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock API Kit Router" doc:id="56674e3d-aff4-4e2f-9149-f4de02c4040a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="care-benefit-verification-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="PUT" doc:name="Request" doc:id="91955506-0c8f-48c8-8f73-2e4a09bebedf" config-ref="HTTP_Request_configuration" path="/api/v1/chemicaldetails" responseTimeout="120000" >
+				<http:headers ><![CDATA[#[{"Accept":"application/json","accept":"application/json"}]]]></http:headers>
+				<http:response-validator >
+					<http:success-status-code-validator values="#['406']" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Is Status Code 406?" doc:id="3fb5f76e-4512-456e-99a5-123b09bdcd7e" actual="#[attributes.statusCode]" expected="#[406]" message="Status Code not equal to 406" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="getPing-415-error-test-case" doc:id="f0365f4b-3edd-4da3-97fd-43212c520704" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="care-benefit-verification-main" />
+			<munit:enable-flow-source value="apikitErrors" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock API KIT Router" doc:id="8e8e7492-05e1-4fc1-9cb7-14cfd8bb1b2c" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="care-benefit-verification-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="GET" doc:name="Request" doc:id="7c7d561e-3349-47e6-ae11-e452723d868c" config-ref="HTTP_Request_configuration" path="/api/v1/chemicaldetails" responseTimeout="120000" >
+				<http:headers ><![CDATA[#[{"Accept":"application/json","accept":"application/json"}]]]></http:headers>
+				<http:response-validator >
+					<http:success-status-code-validator values="#['415']" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Is Status Code 415?" doc:id="e3bd80c6-7db0-4f82-bff1-1c0a96720753" actual="#[attributes.statusCode]" expected="#[415]" message="Status Code not equal to 415" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="getPing-429-error-test-case" doc:id="3fccbdec-87fb-4b2e-b2cd-6e629b0e7da8" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="care-benefit-verification-main" />
+			<munit:enable-flow-source value="apikitErrors" />
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock API KIT Router" doc:id="e9b2abf4-2ba5-4da1-b3b5-ac8c34a85635" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="care-benefit-verification-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:TOO_MANY_REQUESTS" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="PUT" doc:name="Request" doc:id="1ee3a360-5517-4eb6-bf0e-c3343758b56d" config-ref="HTTP_Request_configuration" path="/api/v1/chemicaldetails" responseTimeout="120000" >
+				<http:headers ><![CDATA[#[{"Accept":"application/json","accept":"application/json"}]]]></http:headers>
+				<http:response-validator >
+					<http:success-status-code-validator values="#['429']" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Is Status Code 429?" doc:id="85acd086-1acc-4119-ae37-85b3b823d7a3" actual="#[attributes.statusCode]" expected="#[429]" message="Status Code not equal to 429" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="getPing-500-error-test-case" doc:id="77093547-eb76-46a0-b077-79a7bdab3066" >
+		<munit:enable-flow-sources >
+			<munit:enable-flow-source value="care-benefit-verification-main" />
+			<munit:enable-flow-source value="apikitErrors" />
+			<munit:enable-flow-source value="get:\ping:care-benefit-verification-config" />
+			
+		</munit:enable-flow-sources>
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock API KIT Router" doc:id="62a65c9c-38a3-4dad-9a91-16dd88df9028" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="care-benefit-verification-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<http:request method="GET" doc:name="Request" doc:id="2e7167c8-c17c-448f-8fb7-0d54619b02e9" config-ref="HTTP_Request_configuration" path="/api/v1/ping" responseTimeout="120000" >
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Accept" : "application/json",
+	"Content-Type" : "application/json"
+}]]]></http:headers>
+				<http:response-validator >
+					<http:success-status-code-validator values="#['500']" />
+				</http:response-validator>
+			</http:request>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Is Status Code 500?" doc:id="f0bff069-c4fa-491f-8905-44ccd61168a7" actual="#[attributes.statusCode]" expected="#[500]" message="Status Code not equal to 500" />
+		</munit:validation>
+	</munit:test>
+	
+</mule>

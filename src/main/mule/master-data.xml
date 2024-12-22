@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="GET-code-set-CPT-Sub_Flow" doc:id="504adb82-7b9b-461b-be4d-62a20f8178af" >
+		<logger level="INFO" doc:name="Start:Logger" doc:id="b50d2828-e35a-4986-9ead-baa375a3ffdf" message='#["Start: Get ProcedureCode details"]'/>
+		<salesforce:query doc:name="ProcedureCode Query" doc:id="2f4088dd-3e49-44d7-9992-cd053899cfdf" config-ref="Salesforce_Config_BasicAuth">
+			<salesforce:salesforce-query ><![CDATA[SELECT Id,Code,Name,CodeDescription,CodeSetKey,CodeSetType,CreatedDate,EndDate,IsActive FROM CodeSet WHERE 
+IsActive = true and CodeSetType = 'CPT' and Code = ':procedurecode']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	procedurecode : vars.inputPayload.serviceDetails.procedureCode
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="3e599a46-5561-4090-a886-ef09f3a5c127" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End:Logger" doc:id="6db19795-9894-45ba-a988-75c639d00c75" message='#["End: Get ProcedureCode details"]'/>
+	</sub-flow>
+	<sub-flow name="GET-code-set-ICD-Sub_Flow" doc:id="1fae17b6-848f-471c-8976-bb5337e87364" >
+		<logger level="INFO" doc:name="Start:Logger" doc:id="15a2a70b-4e42-4506-a60c-304db2339ad8" message='#["Start: Get Diagnosis Code details"]' />
+		<salesforce:query doc:name="DiagnosisCode Query" doc:id="c081e37c-464f-4212-8f27-256f349ba44e" config-ref="Salesforce_Config_BasicAuth" >
+			<salesforce:salesforce-query ><![CDATA[SELECT Id,Code,CodeDescription,CodeSetKey,CodeSetType,CreatedDate,EndDate,IsActive,Name,OwnerId FROM CodeSet 
+WHERE IsActive = true and CodeSetType = 'ICD-10' and Code = ':diagnosiscode']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	diagnosiscode : vars.inputPayload.serviceDetails.diagnosisCode
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="fb0757df-9522-4c68-b9f5-176458c27961" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End:Logger" doc:id="49ba88ca-1787-4488-963a-eb1e776ab21b" message='#["End: Get Diagnosis details"]' />
+	</sub-flow>
+	<sub-flow name="GET-provider-Information-Sub_Flow" doc:id="8f160c08-6fd9-402f-9d63-7d7b90a1573b" >
+		<logger level="INFO" doc:name="Start:Logger" doc:id="64697f61-8a39-43fa-b0db-45451f83d7c2" message='#["Start: Get Provide Information details"]' />
+		<salesforce:query doc:name="Provider Information" doc:id="b9db369f-89b1-4ec9-849f-ed47eab6fd1a" config-ref="Salesforce_Config_BasicAuth">
+			<salesforce:salesforce-query ><![CDATA[SELECT Id,AccountId,Name,Npi FROM HealthcareProviderNpi
+where IsActive = true and Npi =':npi' and Name = ':name']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	npi : vars.inputPayload.providerInformation.nationalProviderIdentifier,
+	name : vars.inputPayload.providerInformation.providerName
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="6cb0a8e7-97de-4425-9854-1f2f2bcd6920" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End:Logger" doc:id="4addb0ef-009e-4c87-8aa9-1fcb2a43f124" message='#["End: Get Provide Information details"]' />
+	</sub-flow>
+	<sub-flow name="GET-Insurence-Information-Sub_Flow" doc:id="4832026d-9588-49a3-bb75-a14841aaf326" >
+		<logger level="INFO" doc:name="Start:Logger" doc:id="1c9f5f4b-b64f-4363-9a4e-3e0d3878229e" message='#["Start:Get MemberPlan Details"]'/>
+		<salesforce:query doc:name="Insurence Information" doc:id="59f402ec-da6f-4412-be21-5ff2de997773" config-ref="Salesforce_Config_BasicAuth" >
+			<salesforce:salesforce-query ><![CDATA[SELECT Id,Name,SubscriberId,GroupNumber  FROM MemberPlan where
+ Name=':insuranceProviderName' and GroupNumber=':groupNumber']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	insuranceProviderName : vars.inputPayload.insuranceInformation.insuranceProviderName,
+	groupNumber : vars.inputPayload.insuranceInformation.groupNumber
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="e5e90b55-fa37-49ce-b84e-ffad25770586" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End:Logger" doc:id="28d50e3e-5a34-4843-a3d1-5091e08d1054" message='#["End:Get MemberPlan Details"]'/>
+	</sub-flow>
+	<sub-flow name="GET-Patient-Details-Sub_Flow" doc:id="1b480ba1-85f2-455d-80aa-b6852b29e68e" >
+		<logger level="INFO" doc:name="Start:Logger" doc:id="61c3233b-1576-4fdf-880f-5008b25f3d02" message='#["Start:Get Patient Details"]'/>
+		<salesforce:query doc:name="Patient Information" doc:id="991731e6-8579-4e34-927d-b38272a0925d" config-ref="Salesforce_Config_BasicAuth" >
+			<salesforce:salesforce-query ><![CDATA[SELECT Id,FirstName ,LastName,PersonBirthdate,PersonGender FROM Account
+Where FirstName =':firstName' and lastName =':lastName' 
+and PersonBirthdate =:dateOfBirth
+and PersonGender =':gender']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	firstName : vars.inputPayload.patientDetails.firstName,
+	lastName : vars.inputPayload.patientDetails.lastName,
+	gender : vars.inputPayload.patientDetails.gender,
+	dateOfBirth : vars.inputPayload.patientDetails.dateOfBirth as Date {format: 'yyyy-MM-dd'}
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="61fdca60-5bea-4a8a-a1c9-bb8871a6e58a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End:Logger" doc:id="9bd952f4-9e16-465e-af84-e43a061129c2" message='#["End:Get Patient Details"]'/>
+	</sub-flow>
+</mule>

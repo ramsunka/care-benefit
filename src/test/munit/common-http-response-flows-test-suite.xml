@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="common-http-response-flows-test-suite.xml" />
+	<munit:test name="common-http-response-flows-test-suite-setResponse404Test" doc:id="9b72e330-0513-4d5a-b581-731d19fa8cbd" description="Test">
+		<munit:enable-flow-sources>
+            <munit:enable-flow-source value="care-benefit-verification-main" />
+        </munit:enable-flow-sources>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to setResponse404" doc:id="88ef4478-9350-43b8-9efc-54c499c1d967" name="setResponse404SubFlow"/>
+		</munit:execution>
+		<munit:validation>
+            <munit-tools:assert-that expression="#[vars.httpStatus]" is='#[MunitTools::equalTo("404")]' message="The response payload is not correct!" doc:name="Assert That Status Code is 404" />
+        </munit:validation>
+	</munit:test>
+	<munit:test name="common-http-response-flows-test-suite-setResponse200Test" doc:id="d53ec81f-7563-4eeb-b2ea-d83d893b2f86" description="Test">
+		<munit:enable-flow-sources>
+            <munit:enable-flow-source value="care-benefit-verification-main" />
+        </munit:enable-flow-sources>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to setResponse200" doc:id="274c075d-949a-4aa9-8bc9-59f0ad0423e3" name="setResponse200SubFlow"/>
+		</munit:execution>
+		<munit:validation>
+            <munit-tools:assert-that expression="#[vars.httpStatus]" is='#[MunitTools::equalTo(200)]' message="The response payload is not correct!" doc:name="Assert That Status Code is 200" />
+        </munit:validation>
+	</munit:test>
+	<munit:test name="common-http-response-flows-test-suite-setResponse204Test" doc:id="235552d1-da51-40f5-99b6-7ed68990ad19" description="Test">
+		<munit:enable-flow-sources>
+            <munit:enable-flow-source value="care-benefit-verification-main" />
+        </munit:enable-flow-sources>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to setResponse204" doc:id="14375a1a-31b9-4c5b-82d7-efedb79c4407" name="setResponse204SubFlow"/>
+		</munit:execution>
+		<munit:validation>
+            <munit-tools:assert-that expression="#[vars.httpStatus]" is='#[MunitTools::equalTo("204")]' message="The response payload is not correct!" doc:name="Assert That Status Code is 204" />
+        </munit:validation>
+	</munit:test>
+
+</mule>

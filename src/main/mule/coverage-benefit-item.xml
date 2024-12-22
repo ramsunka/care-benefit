@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<sub-flow name="POST-CareBenefitVerifyRequest-Sub_Flow" doc:id="cc1836ef-c35e-4fbb-b0bf-1b5092349ce2">
+		<tracking:custom-event doc:name="Custom Business Event" doc:id="26b6afd9-fcac-44ad-a4ce-cfe7d470baf3" event-name="CareBenefitVerify Request"/>
+		<choice doc:name="Optional Benefit Data ?" doc:id="c3835665-519b-4337-a0f3-504a340725ed" >
+			<when expression="#[!isEmpty(vars.inputPayload.serviceDetails)]">
+				<flow-ref doc:name="Upsert Coverage benefit SubFlow" doc:id="484e1a26-98fd-4db1-967b-810b6180a34a" name="Upsert-coverage-benefit-Sub_Flow" />
+				<flow-ref doc:name="Upsert Coverage benefit Item SubFlow" doc:id="98632a88-3d06-42ac-bbab-b826a604041d" name="Upsert-coverage-benefit-item-Sub_Flow" />
+			</when>
+		</choice>
+		<flow-ref doc:name="Upsert-CareBenefitVerifyRequest SubFlow" doc:id="1e65b20b-6fed-4946-9b60-747d9cacd9f1" name="Upsert-CareBenefitVerifyRequest-Sub_Flow" />
+		<flow-ref doc:name="Invoke commonUpdateObjectResponseSubFlow" doc:id="28edb2c7-1223-49b8-9d08-4284aaab2af9" name="commonUpdateObjectResponseSubFlow" />
+	</sub-flow>
+	<sub-flow name="Upsert-coverage-benefit-Sub_Flow" doc:id="d750f565-423a-4b54-95f8-565982aec946" >
+		<ee:transform doc:name="CoverageBenefitRequest" doc:id="9b788700-1d07-46fc-b783-22b64b49e31e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[
+	{
+	"MemberPlanId": vars.insurenceObject.Id,
+	"MemberId" : vars.patientObject.Id,
+	"BenefitPeriodStartDate" : vars.inputPayload.serviceDetails.serviceDate as Date {format: 'yyyy-MM-dd'} default null,
+	"Name": "CoverageBenefit -" ++ vars.inputPayload.serviceDetails.serviceType
+    }
+] ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="2d0825ba-4dbe-4a42-bbf2-8ee9600734e5" >
+			<salesforce:upsert objectType="CoverageBenefit" externalIdFieldName="Id" doc:name="Upsert-CoverageBenefit" doc:id="91d223a9-c8e6-4292-b5a6-c2ddcb8a7b1b" config-ref="Salesforce_Config_BasicAuth" target="coveragebenefitObject" />
+		</until-successful>
+	</sub-flow>
+	<sub-flow name="Upsert-coverage-benefit-item-Sub_Flow" doc:id="c1172c44-79ff-4b98-8203-eb89502b0620" >
+		<ee:transform doc:name="Transform Message" doc:id="13c61ffd-d19c-4561-a572-b6a679ae387a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	{
+	"Name": "BenefitsItem - " ++ vars.inputPayload.serviceDetails.serviceType,
+	"CodeSetServiceTypeId": vars.diagnosisObject[0].Id,
+	"CoverageBenefitId": vars.coveragebenefitObject.items[0].id
+	},
+	{
+	"Name": "BenefitsItem - " ++ vars.inputPayload.serviceDetails.serviceType,
+	"CodeSetServiceTypeId": vars.procedureObject[0].Id,
+	"CoverageBenefitId": vars.coveragebenefitObject.items[0].id
+	}
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="1d0ac776-0ec3-49e0-b8c7-a1314c9b0629" >
+			<salesforce:upsert objectType="CoverageBenefitItem" externalIdFieldName="Id" doc:name="Upsert-CoverageBenefititem" doc:id="fa8a6019-542b-4a0e-80dc-08eb471f236a" config-ref="Salesforce_Config_BasicAuth" target="coveragebenefitItemObject" />
+		</until-successful>
+	</sub-flow>
+	<sub-flow name="Upsert-CareBenefitVerifyRequest-Sub_Flow" doc:id="f35d3f61-a95e-457c-a349-8c3d76ce9fc1" >
+		<ee:transform doc:name="CareBenefitVerifyRequest" doc:id="e35a9b36-d0d5-44b8-9ba5-3a3f6f002f12">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[
+{
+	"MemberPlanId": vars.insurenceObject.Id,
+	"RequestDate" : now() ,
+	"CoverageBenefitId": vars.coveragebenefitObject.items[0].id default null
+}
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="0e708256-a962-42f4-a6bc-be9f390dbdc5" >
+			<salesforce:upsert objectType="CareBenefitVerifyRequest" externalIdFieldName="Id" doc:name="Upsert-CareBenefitVerifyRequest" doc:id="a4f1198d-58b2-405b-9ba5-58b478bbf79e" config-ref="Salesforce_Config_BasicAuth" />
+		</until-successful>
+	</sub-flow>
+	<sub-flow name="GET-Care-benefit-Requests-Sub_Flow" doc:id="c05a0473-2e67-4366-a6ff-d48c05a87fb8" >
+		<salesforce:query doc:name="Query CareBenefitVerifyRequest" doc:id="8325871b-c8d0-4830-845d-98d1f895ac02" config-ref="Salesforce_Config_OAuthUserPass">
+			<salesforce:salesforce-query ><![CDATA[select Name,Id,	
+CaseId,MemberPlanId,RequestDate,
+CoverageBenefitId,Status,StatusReason from CareBenefitVerifyRequest]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<flow-ref doc:name="commonUpdateObjectResponseSubFlow" doc:id="29c380b8-dd63-4212-898c-ef6f8edfcfd9" name="commonRetrieveObjectResponseSubFlow"/>
+	</sub-flow>
+
+</mule>

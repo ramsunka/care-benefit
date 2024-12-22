@@ -1,0 +1,45 @@
+#%RAML 1.0
+title: CARE-BENEFIT-VERIFICATION
+description:  API for care benefit verification
+version: v1
+protocols: [HTTPS]
+documentation:
+ - title: care-benefit-verification-api
+   content: |
+     This api consists of these endpoints: ping, /care-benefit-verification.
+securitySchemes: 
+    #  client-credentials:    
+    #   type: x-client-credentials    
+    #    description: Use application client_id and secret assigned by API administrator.    
+    #  basic:    
+    #    type: Basic Authentication
+
+uses:  
+    standard-security: libraries/traits/standard-security.raml
+    commontraits: libraries/traits/standard-error-responses.raml
+    commonresponse: libraries/traits/standard-success-response.raml
+    common-lib: libraries/resources/common-resourcetype.raml
+    carebenReq : libraries/resources/CareBenefitVerificationRequestType.raml
+
+
+/ping: 
+    type: 
+       common-lib.rest-resource:  
+            getOutputExample: !include libraries/examples/ping/ping-response.json
+            getOutputDescription: Return a standard ping response
+    get:
+            
+/care-benefit-verification:  
+    type:  
+       common-lib.rest-resource:  
+             postDescription: This resource is used to create the care benefit verification
+             postInputType:  carebenReq.CareBenefitVerification
+             postInputExample: !include libraries/examples/PostCareBenefitVerificationRequest.json
+             postOutputExample: !include libraries/examples/SFDCStandardResponse.json
+             getOutputExample: !include libraries/examples/GetCareBenefitVerifyResponse.json
+             getOutputDescription: Return a standard ping response 
+    post:
+    get:
+ 
+
+  

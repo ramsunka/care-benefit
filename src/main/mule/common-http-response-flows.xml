@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<sub-flow name="setResponse201SubFlow" doc:id="8361bf67-30e5-4aa8-965d-663abf9067bf" doc:description="Sub flow to set 201 response payload">
+	<set-variable value="201" doc:name="set HTTP Status to 201"  variableName="httpStatus" />
+	
+		<ee:transform doc:name="successResponse" doc:id="55efb54b-b901-4403-bca3-32ace98a1f8e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.items map {
+	"Successful": $.successful,
+	"RecordId":  $.id 
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+
+	</sub-flow>
+		<sub-flow name="setResponse404SubFlow" doc:description="Sub flow to set 404 response payload">
+		<set-variable value="404" doc:name="set HTTP Status to 404" doc:id="7fde2c2f-849e-4607-8e1f-7314ba2409f7" variableName="httpStatus"/>
+		<ee:transform doc:name="setPayloadtoEmpty" doc:id="973d902b-7bf0-4080-9a40-0f56b617e26f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="setResponse200SubFlow" doc:id="d9e82283-a8a7-480a-8557-6d5dd11ec70d" doc:description="Sub flow to set 200 response payload">
+		<set-variable value="200" doc:name="set HTTP Status to 200" doc:id="c00fa9b5-7bcd-4dae-b3a9-926ba3a9d0c0" variableName="httpStatus" />
+		<ee:transform doc:name="successResponse" doc:id="1074936c-1254-4302-b686-0ed19d4287ce">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message": "Request processed successfully"
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+200]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="setResponse204SubFlow" doc:id="77cbb3ac-0f6e-4483-9ef3-877afce67ac8" doc:description="Sub flow to set 204 response payload">
+		<set-variable value="204" doc:name="set HTTP Status to 204" doc:id="1ea3def7-2a21-4a9b-8bd0-64201e71dbc3" variableName="httpStatus"/>
+		<ee:transform doc:name="setPayloadtoEmpty" doc:id="baea0244-88cd-489c-90c4-654bc651a651">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="commonRetrieveObjectResponseSubFlow" doc:id="e1667bdb-9456-46e4-bc97-49d97dcf7967" doc:description="Sub flow to check retrieve object response payload">
+		<choice doc:name="Check Payload" doc:id="106c9538-b712-41f6-9197-f3515c2fe400" >
+			<when expression="#[payload[0].Id != null]" >
+				<ee:transform doc:name="Json format" doc:id="6603b90b-8abd-428f-8879-7b33a5821186" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[import * from dw::core::Strings
+%dw 2.0
+output application/json
+fun capitalizeData(payload) = payload map(inputPayload) -> {
+					(inputPayload mapObject (val,key) ->
+					(capitalize(key) replace " " with ""): val)
+					}
+---
+capitalizeData(payload)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<flow-ref doc:name="Invoke setResponse204SubFlow" doc:id="f20e61c4-128a-421a-9e85-66a3799edecf" name="setResponse204SubFlow" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="commonUpdateObjectResponseSubFlow" doc:id="5212756a-3f66-429d-aa40-062329646f16" doc:description="Sub flow to check update object response payload">
+		<choice doc:name="Check Payload" doc:id="38c9c01f-ce53-48a5-b583-39075e764c8a" >
+			<when expression="#[payload.successful == true]" >
+				<flow-ref doc:name="Invoke setResponse201SubFlow" doc:id="7f7f2d50-736c-40c4-9b43-57e6930309d2" name="setResponse201SubFlow" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Default Response Payload" doc:id="7b6ea661-ff53-4c86-bae2-53f28d1fc025" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.items map {
+	"Successful": $.successful,
+	"RecordId":  if ($.id != null) $.id else "",
+	"ErrorMessage":  if ($.message != null) $.message else ""
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

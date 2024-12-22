@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<munit:config name="router-test-suite.xml" />
+	<munit:test name="router-test-suite-post:\care-benefit-verificationTest" doc:id="6febf421-d257-4e4d-bd5c-a84a0ab39568" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="0ea18863-b6c8-4c98-94d4-202e7523c0e7" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/PatientDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Insurence Information" doc:id="98c89876-fda7-4c61-9fc4-bd358350fb59" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="59f402ec-da6f-4412-be21-5ff2de997773" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/InsurenceDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Provider Information" doc:id="8aeead75-ca54-49f5-97a6-f833c5d193ce" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b9db369f-89b1-4ec9-849f-ed47eab6fd1a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/ProviderDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock DiagnosisCode Query" doc:id="7ffaa10e-ea61-4cc0-b80f-2f99e839246c" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="DiagnosisCode Query" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="c081e37c-464f-4212-8f27-256f349ba44e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/DiagnosisDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock ProcedureCode Query" doc:id="fb4d8690-51d6-48f5-a2a1-55ec3fd42442" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ProcedureCode Query" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2f4088dd-3e49-44d7-9992-cd053899cfdf" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/ProcedureDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Upsert-CoverageBenefit" doc:id="11fea6cf-14fc-4144-868d-a4c591460a5c" processor="salesforce:upsert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Upsert-CoverageBenefit" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="91d223a9-c8e6-4292-b5a6-c2ddcb8a7b1b" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Salesforce_Config_BasicAuth" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="coveragebenefitObject" value="#[MunitTools::getResourceAsString('mock_response/coveragebenefitObject.json')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Upsert-CoverageBenefititem" doc:id="205c1df7-fb7e-44a4-9a35-f95880a9e7ef" processor="salesforce:upsert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Upsert-CoverageBenefititem" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fa8a6019-542b-4a0e-80dc-08eb471f236a" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="coveragebenefitItemObject" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="coveragebenefitItemObject" value="#[MunitTools::getResourceAsString('mock_response/coveragebenefitItemObject.json')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Upsert-CareBenefitVerifyRequest" doc:id="46439b3c-3426-4470-b7e6-56789573290c" processor="salesforce:upsert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Upsert-CareBenefitVerifyRequest" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="a4f1198d-58b2-405b-9ba5-58b478bbf79e" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Salesforce_Config_BasicAuth" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/finalresponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ba6e074f-436e-4762-b945-9db778053700" >
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="0737ec40-02eb-40c9-b80b-bf919246f351" name="post:\care-benefit-verification"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="939efa99-7381-434d-9f69-752ce90882da" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="bdc2cbf4-c153-4907-b32c-d6c50866d1a4" processor="salesforce:query" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="d34b0b3d-ca7e-47ea-bf9f-181edff600bd" processor="salesforce:query" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="58c0eedf-157b-48ec-850f-fbb47124473b" processor="salesforce:query" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-post:\care-benefit-verificationTest-without-providerinformation" doc:id="0d3d95e3-b73a-4074-b9f8-deccab11b8b0" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="6f7eaa8a-6924-4991-b375-522d98b0aeb3" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/PatientDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Insurence Information" doc:id="9be2d643-f2b3-40f9-9a4f-b8338701844a" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="59f402ec-da6f-4412-be21-5ff2de997773" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/InsurenceDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Upsert-CoverageBenefititem" doc:id="bdd644a4-e2d8-4b7f-8960-961cb1dfa562" processor="salesforce:upsert" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Upsert-CoverageBenefititem" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fa8a6019-542b-4a0e-80dc-08eb471f236a" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="coveragebenefitItemObject" attributeName="target" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="coveragebenefitItemObject" value="#[MunitTools::getResourceAsString('mock_response/coveragebenefitItemObject.json')]" mediaType="application/json" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Upsert-CareBenefitVerifyRequest" doc:id="87994cb5-7810-4591-b2b5-f44ad7ea5011" processor="salesforce:upsert" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Upsert-CareBenefitVerifyRequest" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="a4f1198d-58b2-405b-9ba5-58b478bbf79e" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Salesforce_Config_BasicAuth" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/finalresponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f9f8f90f-a199-4490-a8da-4c1ab9fcd1e9" >
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationWithoutProviderInformationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationWithoutProviderInformationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="5b2e23d1-8662-4f03-b2bb-112931e482e0" name="post:\care-benefit-verification"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="093379f5-8100-4fca-826b-43bc65900564" is="#[MunitTools::notNullValue()]" expression="#[payload]" />
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="41144cd0-3ffa-4fe7-bbbb-00d50f3cdbe0" actual="#[MunitTools::getResourceAsString('mock_response/SuccessResponse.json')]" expected="#[MunitTools::getResourceAsString('mock_response/SuccessResponse.json')]" message="#['Flow is success']"/>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="d61e397b-c754-4ed4-b6a4-fc2f1016550f" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call1" doc:id="10d80514-4851-4b57-b3c5-75f20abec211" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-care-benefit-verification-mainTest-patient-validation" doc:id="c9054568-34f1-4a16-8429-eb17fad7e74c" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="c7720844-116d-445e-a8ec-d37b03ba7ebc" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/StandardEmptyResponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:name="Set Event" doc:id="131ba4e9-1303-43ce-bd57-69ad52a3aca1" >
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationWithoutProviderInformationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationWithoutProviderInformationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="cc4af68f-7b83-42fe-9c3e-ec4ceb1e5684" name="post:\care-benefit-verification" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="d8944627-cc33-41c5-9464-2ee2609ccc43" processor="salesforce:query" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-post:\care-benefit-verificationTest-insurance-validation" doc:id="ca011ce1-2ea3-458a-a216-c391b7ce528e" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="8c597bbd-4bc1-46cb-b91b-cbae95261af9" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/PatientDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Insurence Information" doc:id="e9dec25c-c8e4-4553-b146-e9e75b7394f2" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="59f402ec-da6f-4412-be21-5ff2de997773" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/StandardEmptyResponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="bc57a524-dc89-4775-a06e-2555497665e8">
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationWithoutProviderInformationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables>
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationWithoutProviderInformationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="767af88d-e215-4d4d-8acd-52f7310d5e75" name="post:\care-benefit-verification"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="d08ceae8-7fc4-452b-b500-11490d8645a0" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="207e258f-1596-413c-858e-d0419dc9daff" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-post:\care-benefit-verificationTest-provider-validation" doc:id="c4197496-24bf-4979-a915-3330fe3eb20b" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="f1c83f6b-3c90-4aba-9550-b9a9f8af9ed2" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/PatientDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Insurence Information" doc:id="1036bbe7-c002-4606-ab12-545d2debc506" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="59f402ec-da6f-4412-be21-5ff2de997773" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/InsurenceDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Provider Information" doc:id="5e08fa93-dc9a-4b92-8507-d1f8dd45d8ee" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b9db369f-89b1-4ec9-849f-ed47eab6fd1a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/StandardEmptyResponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="948326ba-4923-4589-a1a3-65a2f8ac0084">
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables>
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="00ba186a-ab43-4251-bf52-de2db8d47f14" name="post:\care-benefit-verification"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="8013ecd8-9a49-4ce4-bff6-6e65dfc5b798" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="2d18708c-3f02-427e-8e97-bf5cad7f79e7" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="068fd273-0dfe-4f27-ba0c-12ea34ad2396" processor="salesforce:query" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-post:\care-benefit-verificationTest-DiagnosisCode-validation" doc:id="3411508a-754d-4d34-b51d-02a860bd5b54" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="f4a4e339-374a-4597-86fd-c31daa44f400" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/PatientDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Insurence Information" doc:id="d74f3a6b-9773-41fa-8433-5068e1eaa6a9" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="59f402ec-da6f-4412-be21-5ff2de997773" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/InsurenceDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Provider Information" doc:id="8f182676-6834-48be-9210-12b29c9db112" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b9db369f-89b1-4ec9-849f-ed47eab6fd1a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/ProviderDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock DiagnosisCode Query" doc:id="756519b1-3bc6-45ff-8dd4-ea3f396ed141" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="DiagnosisCode Query" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="c081e37c-464f-4212-8f27-256f349ba44e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/StandardEmptyResponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="07590384-9efc-438e-ab4d-2b4272cf92b7" >
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="fdabb847-e667-4b59-8584-92f207615c1f" name="post:\care-benefit-verification" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="2d4ae3f9-3997-4911-98eb-673770d93c79" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="042e0bd9-ba2c-4001-af78-b95313df2ec8" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="b447fdf0-ceab-4bcc-928d-0d67545d70b7" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-post:\care-benefit-verificationTest-procedure-validation" doc:id="53040771-2f9c-4936-8a49-2bf4b12dafcb" description="Test" expectedErrorType="MULE:CRITICAL" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Patient Information" doc:id="04337ae8-df39-4c64-a6c2-a53ab94a3ccb" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="991731e6-8579-4e34-927d-b38272a0925d" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/PatientDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Insurence Information" doc:id="79298c31-e7e9-4d4b-a442-3c4fa932d5f7" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="59f402ec-da6f-4412-be21-5ff2de997773" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/InsurenceDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Provider Information" doc:id="c8d65603-5ded-421d-8884-7caaea706558" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b9db369f-89b1-4ec9-849f-ed47eab6fd1a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/ProviderDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock DiagnosisCode Query" doc:id="ba41d363-d7e7-40b4-923c-beb75f34a6e3" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="DiagnosisCode Query" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="c081e37c-464f-4212-8f27-256f349ba44e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/DiagnosisDetails.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock ProcedureCode Query" doc:id="25c8673b-f578-4a57-8cd3-6cd5ef9dbd35" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ProcedureCode Query" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2f4088dd-3e49-44d7-9992-cd053899cfdf" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/StandardEmptyResponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="36fa534c-95bd-439a-9887-253c1743fa31" >
+				<munit:payload value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:variables >
+					<munit:variable key="inputPayload" value="#[MunitTools::getResourceAsString('mock_request/PostCareBenefitVerificationRequest.json')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\care-benefit-verification" doc:id="2c094098-8586-4ecf-a291-a0028522a7a8" name="post:\care-benefit-verification" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:fail doc:name="Fail" doc:id="4ef9d0a8-4279-4a79-bfb5-67d2b9850a92" />
+			<munit-tools:verify-call doc:name="Verify call" doc:id="ae139b5e-5422-49ab-8014-88d6aa5cdc63" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Patient Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="b48657ba-f668-420c-ac86-9f3ebed59cd8" processor="salesforce:query" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insurence Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="429dd30f-fedc-46eb-87bb-3dc49351acc1" processor="salesforce:query" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Provider Information" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-care-benefit-verification-mainTest" doc:id="c4b471fe-7f88-4d9b-b38a-f0eadb4e7976" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to care-benefit-verification-main" doc:id="31acb58c-9144-4b91-9a77-cf59a3326a56" name="care-benefit-verification-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="4e3e2e09-fd41-41d5-9950-a2192e5fde83" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="care-benefit-verification-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suiteTest-ping" doc:id="7b32e8cf-ab0b-452b-8a55-930ef2865e25">
+		<munit:behavior >
+			<munit-tools:spy doc:name="Spy" doc:id="d8042dab-f86e-4a15-bf60-d8bc29c5b3e2" processor="ee:transform">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Ping Response" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert-that doc:name="Assert that" doc:id="1b332dcd-9208-43cb-bb5b-22393f7277b7" expression="#[payload]" is="#[MunitTools::nullValue()]"/>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert-that doc:name="Assert that" doc:id="79ed445c-0cdc-4764-841a-1ed7f503c622" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:name="Flow-ref get:\ping:care-benefit-verification-config" doc:id="6091f1bc-3127-4dc3-a0cd-edddf0f867c0" name="get:\ping:care-benefit-verification-config" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="fcfa42de-3fe8-46a3-af21-b35fcbb8e842" processor="ee:transform">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Ping Response" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="router-test-suite-care-benefit-verification-consoleTest" doc:id="d496abde-9cb9-4b83-8b6e-7f7d3d850ab4" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to care-benefit-verification-console" doc:id="8fac6eb6-2d40-4089-abac-f0b51088f7f1" name="care-benefit-verification-console"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="router-test-suite-get:\care-benefit-verificationTest" doc:id="8d7044ba-36d1-446d-8d28-a7564fefd750" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5ec9e965-9bf0-46ed-9a0f-62abca2334ab" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Query CareBenefitVerifyRequest" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock_response/GetCareBenefitVerifyResponse.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:name="Spy" doc:id="50e4bc7d-988c-49df-87e0-8e66230c6995" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Query CareBenefitVerifyRequest" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert-that doc:name="Assert that" doc:id="ea74f3f8-476b-48fd-8aed-45f3b3f6c860" is="#[MunitTools::nullValue()]" expression="#[payload]"/>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert-that doc:name="Assert that" doc:id="b9909c78-a1fc-4976-830e-b3c64a11b59a" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\care-benefit-verification" doc:id="786be6a2-964e-423b-9b74-8a04f68929ce" name="get:\care-benefit-verification"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="e306fb06-af3c-483e-ab5a-3cc748bb4524" processor="salesforce:query" atLeast="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Query CareBenefitVerifyRequest" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+
+</mule>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:accelerator-healthcare="http://www.mulesoft.org/schema/mule/accelerator-healthcare" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd  http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd  http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/accelerator-healthcare http://www.mulesoft.org/schema/mule/accelerator-healthcare/current/mule-accelerator-healthcare.xsd">
+	<global-property doc:name="Global Property Mule Env" doc:id="5fa1d140-8cdd-4be6-ad83-0e57fd515138" name="mule.env" value="dev" />
+	<secure-properties:config name="Secure_Properties_Config_Common-Props" doc:name="Secure Properties Config" doc:id="94abaef5-78a5-4a11-8e8c-ebc36487784c" file="config/common-properties.yaml" key="${mule.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<secure-properties:config name="Secure_Properties_Config_Env-Props" doc:name="Secure Properties Config" doc:id="efdf0eeb-0a83-44a2-a1f0-c8650deaf0c1" file="config/config-${mule.env}.yaml" key="${mule.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config> 
+    <http:listener-config name="HTTPS_API_Listener_config" doc:name="HTTP Listener config" doc:id="d75adeff-a0cc-45e2-acb4-be6185bc54b9" >
+		<http:listener-connection host="0.0.0.0" port="${secure::https.port}" protocol="HTTPS" tlsContext="common-selfsigned_tlsContext">
+		</http:listener-connection>
+	</http:listener-config>
+	<tls:context name="common-selfsigned_tlsContext" doc:name="common-selfsigned_tlsContext" doc:id="47f9c6a4-6e2c-45a8-b7cd-302cb174e678">
+        <tls:key-store type="jks" keyPassword="${secure::keystore.keypass}" password="${secure::keystore.password}" path="${secure::keystore.path}" />
+    </tls:context>
+        <global-property doc:name="Global Property Mule Key" doc:id="2e775beb-2a87-460c-bd8d-af0d65e11927" name="mule.key" value="mulesoft" />
+	
+	<apikit:config name="care-benefit-verification-config" api="care-benefit-verification.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="4fd521ed-bee4-4d1f-8695-f0617956fbe2" />
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="fc0d3454-f5d6-439d-8c98-4bd230254b80" config-ref="ObjectStore_Config" />
+	<salesforce:sfdc-config name="Salesforce_Config_OAuthUserPass" doc:name="Salesforce Config" doc:id="96034bcb-7c97-49fd-a735-1f9240a10eef" >
+		<salesforce:oauth-user-pass-connection consumerKey="${secure::salesforce.system.consumerKey}" consumerSecret="${secure::salesforce.system.consumerSecret}" username="${secure::salesforce.system.username}" password="${secure::salesforce.system.password}" securityToken="${secure::salesforce.system.token}" tokenEndpoint="${secure::salesforce.system.token.endpoint}"/>
+	</salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config_BasicAuth" doc:name="Salesforce Config" doc:id="58553c16-3511-4a6b-838d-8c67b969a9b7" >
+		<salesforce:basic-connection username="${secure::salesforce.system.username}" password="${secure::salesforce.system.password}" securityToken="${secure::salesforce.system.token}" url="${secure::salesforce.system.auth.url}"/>
+	</salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config_OAuthv2.0" doc:name="Salesforce Config" doc:id="21f890ba-91e4-4f1a-8a75-58ab17519f57" >
+		<salesforce:config-with-oauth-connection >
+			<salesforce:oauth-authorization-code consumerKey="${secure::salesforce.system.consumerKey}" consumerSecret="${secure::salesforce.system.consumerSecret}" scopes="api" authorizationUrl="${secure::salesforce.system.authorize.endpoint}" accessTokenUrl="${secure::salesforce.system.token.endpoint}"/>
+			<salesforce:oauth-callback-config listenerConfig="HTTPS_API_Listener_config" callbackPath="/callback" authorizePath="/auth" externalCallbackUrl="http://localhost:8081/callback" />
+			<salesforce:oauth-store-config objectStore="Object_store" />
+		</salesforce:config-with-oauth-connection>
+	</salesforce:sfdc-config>
+	<api-gateway:autodiscovery apiId="${secure::api.autodiscoveryID}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="9f61fbbd-d6cf-4006-a09d-7431045df298" flowRef="care-benefit-verification-main" />
+	
+	
+</mule>

@@ -1,0 +1,138 @@
+<!-- [STUDIO:"Transform Message"]<?xml version="1.0" encoding="UTF-8"?> [STUDIO] -->
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="validationsSub_Flow" doc:id="70174024-a014-4946-b4db-d04659f0a192" >
+		<logger level="INFO" doc:name="Logger" doc:id="2369ffdd-72dd-4c36-b5ae-8539b402fe43" message='#["Before Validation of Input data"]'/>
+		<flow-ref doc:name="Patient Validation" doc:id="a299af22-dd88-49b2-8337-f081dfcf1a3d" name="patient_validation_Sub-Flow" />
+		<logger level="INFO" doc:name="Flow:Logger" doc:id="5f16eacf-8e3f-473c-b4af-43fd49a2a13c" message='#["After Patient data validation"]'/>
+		<flow-ref doc:name="Insurence Validation" doc:id="39759f7a-1125-47d5-975a-e2e7eadbcc79" name="insurence_validation_Sub-Flow"/>
+		<logger level="INFO" doc:name="Flow:Logger" doc:id="da5615db-6828-494a-936b-dfb78e9f4881" message='#["After Insurence information validation"]'/>
+		<choice doc:name="Choice" doc:id="c87a6b6c-84c2-47bf-bed3-2b3c8efaa8fc" >
+			<when expression="#[!isEmpty(vars.inputPayload.providerInformation)]">
+				<flow-ref doc:name="Provider Validation" doc:id="903a91c4-0f5b-4cca-b0a6-bb99268fb9c6" name="provider_validation_Sub-Flow" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Flow:ogger" doc:id="4b2a2303-d190-44e1-a420-1344322c9fcd" message='#["Provider information is not available hence skipping validations"]'/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Flow:Logger" doc:id="6c35de0d-07e8-497e-8a62-f525f480195a" message='#["After Provider Information Validation"]'/>
+		<choice doc:name="Choice" doc:id="e09900d4-15d1-4952-b61f-b3761c755d85" >
+			<when expression="#[!isEmpty(vars.inputPayload.serviceDetails)]">
+				<flow-ref doc:name="Dignosis Code Validation" doc:id="c36104a3-73b5-4030-88ec-02f0f0300aa4" name="diagnosis_validation_Sub-Flow" />
+				<flow-ref doc:name="Procedure Code Validation" doc:id="de5f952d-798a-4fe2-a856-2e2127cfeb18" name="procedure_validation_Sub-Flow" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Flow:Logger" doc:id="1e5d1158-437d-4392-a43e-6475cba9b726" message='#["Service Details are not available hence skipping validations"]'/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="patient_validation_Sub-Flow" doc:id="64055b20-3007-4049-9bd4-09b4dc694b63" >
+		<flow-ref doc:name="Query Patient Details" doc:id="15cfb1ac-f7bc-4abd-a4f9-6fe316f581e9" name="GET-Patient-Details-Sub_Flow"/>
+		<choice doc:name="Choice" doc:id="873c02a4-6a60-4622-a644-8eb7a16558eb" >
+			<when expression="#[isEmpty(payload)]">
+				<set-variable value="404" doc:name="set HTTP Status to 404" doc:id="0cea97b1-fd19-4410-8e1c-8144f41fd675" variableName="httpStatus" />
+				<raise-error doc:name="SFHC:PATIENT_NOT_FOUND" doc:id="a0f6a6c7-7267-4ddc-b16e-7de653e295ca" type="SFHC:PATIENT_NOT_FOUND" description="Patient Record Not Found"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Patient Object" doc:id="29fde971-7e64-4653-bedf-f0dc7fabce43" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="patientObject" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="insurence_validation_Sub-Flow" doc:id="0646f4f7-1ef5-457f-a815-2279345b185e" >
+		<flow-ref doc:name="Query Insurence Details" doc:id="6f28d270-5d69-4e8a-9b86-b17f4cd6c1bc" name="GET-Insurence-Information-Sub_Flow" />
+		<choice doc:name="Choice" doc:id="582b481e-f293-422b-bf83-fe94257ad001" >
+			<when expression="#[isEmpty(payload)]" >
+				<set-variable value="404" doc:name="set HTTP Status to 404" doc:id="ef5b79e4-7e9f-410c-993e-c382e4656d0b" variableName="httpStatus" />
+				<raise-error doc:name="SFHC:INSURENCE_NOT_FOUND" doc:id="6d01225c-a3f2-4303-afc4-7b263e3095c7" type="SFHC:INSURENCE_NOT_FOUND" description="Insurence Record Not Found" />
+			</when>
+			<otherwise >
+<ee:transform doc:name="Insurence Object" doc:id="bdf6e3fd-0d1a-4535-9008-e79655475fc8" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="insurenceObject" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="provider_validation_Sub-Flow" doc:id="54391c15-520e-477c-a63f-f3b570066e4f" >
+		<flow-ref doc:name="Query Provider Details" doc:id="a4e5a3e2-7e03-46f4-b0dc-cd8ebe69f4ba" name="GET-provider-Information-Sub_Flow" />
+		<choice doc:name="Choice" doc:id="a182e805-98f5-4b4b-9a9b-ae69bff5d9e7" >
+			<when expression="#[isEmpty(payload)]" >
+				<set-variable value="404" doc:name="set HTTP Status to 404" doc:id="918fef1a-4099-4362-8f37-7ee28f37b8ea" variableName="httpStatus" />
+				<raise-error doc:name="SFHC:PROVIDER_NOT_FOUND" doc:id="4462b305-a169-4514-a5a8-48080a208e2f" type="SFHC:PROVIDER_NOT_FOUND" description="Provider Record Not Found" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Provider Object" doc:id="2e776d7d-5c0c-4dd8-b568-3020ac60b4dd" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="providerObject" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="diagnosis_validation_Sub-Flow" doc:id="e1cda9a6-ee9a-4525-b639-a137c3bdf92d" >
+		<flow-ref doc:name="Query Diagnosis Details" doc:id="07bd2ac2-c88a-4ae6-8846-e39922d59fd3" name="GET-code-set-ICD-Sub_Flow" />
+		<choice doc:name="Choice" doc:id="d2d21f79-58c8-4b3b-8b38-40dc7deaa77e" >
+			<when expression="#[isEmpty(payload)]" >
+				<set-variable value="404" doc:name="set HTTP Status to 40" doc:id="812944cd-ff82-4d3b-abb0-e898887b38c9" variableName="httpStatus" />
+				<raise-error doc:name="SFHC:DIAGNOSIS_NOT_FOUND" doc:id="3974aa71-a0f3-4135-a7e8-50d888c050c5" type="SFHC:DIAGNOSIS_NOT_FOUND" description="Diagnosis Record Not Found" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Diagnosis Object" doc:id="1b65505d-404a-4eab-8fed-e74a93ec8210" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="diagnosisObject" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="procedure_validation_Sub-Flow" doc:id="cb0f1b9d-3883-4a9d-bc6e-f78c19b506a3" >
+		<flow-ref doc:name="Query Procedure Details" doc:id="4902770b-9011-4fed-ad9c-9995e08c44fc" name="GET-code-set-CPT-Sub_Flow" />
+		<choice doc:name="Choice" doc:id="a43dc77d-c52a-4871-811f-15eeb0be6602" >
+			<when expression="#[isEmpty(payload)]" >
+				<set-variable value="404" doc:name="set HTTP Status to 4" doc:id="f36dcd53-c23a-471c-9c7d-b19848f3b99d" variableName="httpStatus" />
+				<raise-error doc:name="SFHC:PROCEDURECODE _NOT_FOUND" doc:id="23d40ceb-f5f3-4ea6-8b37-e336146432be" type="SFHC:PROCEDURECODE _NOT_FOUND" description="Procedure Code Not Found" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="70cd3bb9-9db1-43f5-a762-78861e2b1304" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="procedureObject" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

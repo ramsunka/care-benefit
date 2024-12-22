@@ -1,0 +1,24 @@
+{
+    "patientDetails": {
+        "firstName":"Amari",
+        "lastName": "Rajan",
+        "dateOfBirth": "1990-12-08",
+        "gender": "Male"
+    },
+    "insuranceInformation": {
+        "insuranceProviderName": "Assignment-Plan",
+        "policyNumber": "BC123456789",
+        "groupNumber": "1234567",
+        "subscriberID": "001Kd00001nUlpXIAS"
+    } ,
+    "providerInformation": {
+        "nationalProviderIdentifier": "1234",
+        "providerName": "Assignment-Plan NPI"
+    },
+    "serviceDetails": {
+        "serviceType": "consultation",
+        "serviceDate": "2024-12-14",
+        "diagnosisCode": "8151",
+        "procedureCode": "90834"
+    }
+}
